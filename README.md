@@ -159,6 +159,7 @@ python "$SKILL/scripts/aggregate_notes.py" --up-dir "<analysis>/<昵称>_<UID>"
 - **某期没有字幕**：`fetch_content.py --mode auto` 会自动下载音频并用 faster-whisper 转写（20–50 分钟视频约 3–10 分钟）；也可先 `--mode subtitle` 快速扫描，跳过 ASR。
 - **充电专属 / 会员视频**：账号需为该 UP 的充电会员或有对应权限，否则该期标记 `none`。
 - **`read` 工具读脚本产物报 "binary file"**：若机器安装了透明加密软件（如天锐绿盾），脚本写出的 `.json/.txt` 可能对非白名单进程加密。规则：机器文件只给脚本读，agent 读内容走 `show_content.py`；agent 产出用 `.md`。
+- **透明加密环境下安装**：不要用 `python scripts/install.py` 复制文件（Python 进程写出的文件可能被加密，导致 agent 读取异常）；改用 `cp -r` / PowerShell `Copy-Item` 原生复制。
 - **ASR 模型下载失败**：设置 `BILI_ASR_MODEL` 指向本地 CTranslate2 模型目录（可自行从 HF/ModelScope 下载 `Systran/faster-whisper-small`）。
 - **登录失效**：重新 `bili login`。
 
