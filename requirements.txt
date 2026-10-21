@@ -1,0 +1,3 @@
+# Optional: local ASR for videos without subtitles.
+# The skill works without it (subtitle-only mode); install this for full coverage.
+faster-whisper>=1.0

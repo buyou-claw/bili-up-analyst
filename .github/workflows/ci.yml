@@ -1,0 +1,31 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Compile scripts
+        run: python -m compileall -q scripts
+      - name: Validate SKILL.md frontmatter
+        run: |
+          python - <<'PY'
+          import re
+          from pathlib import Path
+          text = Path("SKILL.md").read_text(encoding="utf-8")
+          assert text.startswith("---"), "SKILL.md must start with YAML frontmatter"
+          m = re.match(r"^---\n(.*?)\n---", text, re.S)
+          assert m, "invalid frontmatter"
+          body = m.group(1)
+          assert "name: bili-up-analyst" in body, "missing name"
+          assert "description:" in body, "missing description"
+          print("SKILL.md ok")
+          PY
