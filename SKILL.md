@@ -70,6 +70,7 @@ Video: <bvid> | Title: <title>
    （输出头部的 NOTE_FILE= / DIGEST_FILE= 就是两份文件的写入路径；part=1/N，依次读 --part 2..N）
 2) 写 NOTE_FILE：短笔记（≤800 字，按 extraction-framework.md；给综合用）
 3) 写 DIGEST_FILE：原味精编（3000–4500 汉字，按 digest-framework.md；保留原话/例子/叙事顺序，给人读）
+   - **视角**：以 UP 主为叙述主体、第一人称复述；被讨论对象直呼其名，**禁止用"他"指代**（避免歧义）。
    若两份都已存在则跳过；只缺 digest 时补写 digest。
 Return only: "DONE <bvid>" or "FAIL <bvid> <reason>".
 ```
