@@ -69,7 +69,7 @@ Video: <bvid> | Title: <title>
 1) python "$SKILL/scripts/show_content.py" --up-dir "$UP_DIR" --bvid <bvid> --part 1 --part-chars 4000
    （输出头部的 NOTE_FILE= / DIGEST_FILE= 就是两份文件的写入路径；part=1/N，依次读 --part 2..N）
 2) 写 NOTE_FILE：短笔记（≤800 字，按 extraction-framework.md；给综合用）
-3) 写 DIGEST_FILE：原味精编（2000–3500 字，按 digest-framework.md；保留原话/例子/叙事顺序，给人读）
+3) 写 DIGEST_FILE：原味精编（3000–4500 汉字，按 digest-framework.md；保留原话/例子/叙事顺序，给人读）
    若两份都已存在则跳过；只缺 digest 时补写 digest。
 Return only: "DONE <bvid>" or "FAIL <bvid> <reason>".
 ```
@@ -78,6 +78,7 @@ Return only: "DONE <bvid>" or "FAIL <bvid> <reason>".
 - 主 agent **绝不**把 raw 字幕读进上下文（只收 subagent 的一行结果）。
 - 已有 `notes/<日期>_<标题>.md` 且 `digests/<日期>_<标题>.md` → 跳过（缓存）。
 - 短笔记 ≤800 汉字（≈600 token）；**digest 只给人读，不进入综合上下文**。
+- 全部精编完成后跑 `append_digest_excerpt.py`：把精编的**节选**作为最后一段（`## 内容精编（补充）`）追加到原笔记，原 9 节格式不变。
 
 ### Step 5 校验笔记（0 token）
 
@@ -146,6 +147,7 @@ python "$SKILL/scripts/aggregate_notes.py" --up-dir "$UP_DIR" --intro "$UP_DIR/s
 - `fetch_content.py` — 抓字幕/AI 摘要/ASR，缓存化；支持 `--since/--until/--limit/--bvid`
 - `show_content.py` — 按 bvid 输出分片内容，头部打印 `NOTE_FILE` / `DIGEST_FILE`
 - `notes_check.py` — 笔记覆盖率与章节校验；支持 `--since/--until`
+- `append_digest_excerpt.py` — 把精编节选追加到笔记末尾（原格式保留，可重复运行）
 - `aggregate_notes.py` — 从笔记自动汇总预测账本与金句（0 token）
 - `_common.py` / `_asr.py` — 公共工具与本地 ASR（`BILI_ASR_THREADS`/`BILI_ASR_BEAM` 可调）
 - `install.py` — 把本 skill 复制到 skills 目录

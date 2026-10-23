@@ -29,7 +29,7 @@ def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--up-dir", required=True)
     ap.add_argument("--min-chars", type=int, default=150)
-    ap.add_argument("--max-chars", type=int, default=2000)
+    ap.add_argument("--max-chars", type=int, default=3500)
     ap.add_argument("--since", default="", help="只校验发布日 >= YYYY-MM-DD 的期数")
     ap.add_argument("--until", default="", help="只校验发布日 <= YYYY-MM-DD 的期数")
     args = ap.parse_args()
