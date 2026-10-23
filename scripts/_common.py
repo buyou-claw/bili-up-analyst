@@ -116,6 +116,7 @@ def video_paths(up_dir: Path, video: dict) -> dict:
         "raw_json": up_dir / "raw" / f"{slug}.json",
         "raw_md": up_dir / "raw" / f"{slug}.md",
         "note": up_dir / "notes" / f"{slug}.md",
+        "digest": up_dir / "digests" / f"{slug}.md",
     }
 
 

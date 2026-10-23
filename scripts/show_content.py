@@ -101,6 +101,7 @@ def main() -> int:
     print(f"# {data.get('title', '')}")
     print(f"bvid={data['bvid']} source={data.get('source', '')} chars={len(text)} part={n}/{len(parts)}")
     print(f"NOTE_FILE={paths['note']}")
+    print(f"DIGEST_FILE={paths['digest']}")
     print(f"RAW_FILE={raw_json}")
     if data.get("ai_summary"):
         print(f"AI_SUMMARY: {data['ai_summary'][:800]}")

@@ -28,7 +28,8 @@ UP 主 (UID / 空间链接 / 昵称)
    raw/<日期>_<标题>.json|.md            # 原始字幕/转写（可读、可复查）
         │  逐期 subagent（见 references/extraction-framework.md）
         ▼
-   notes/<日期>_<标题>.md                # 每期认知笔记（≤800 字）
+   notes/<日期>_<标题>.md                # 每期认知笔记（≤800 字，给综合用）
+   digests/<日期>_<标题>.md              # 每期原味精编（2000–3500 字，给人读）
         │  分桶摘要 + cross-video synthesis（见 references/synthesis-framework.md）
         ▼
    report.md  quotes.md  predictions.md  # 认知档案 / 金句库 / 预测账本
@@ -39,6 +40,7 @@ UP 主 (UID / 空间链接 / 昵称)
 - 🎬 **批量抓取**：`bili user-videos` 风格的清单 + 字幕/摘要/音频转写，支持 `--since/--until/--limit/--bvid` 与断点续跑。
 - 📄 **文件名可读**：`raw/` 与 `notes/` 统一用 `<发布日期>_<视频标题>`，不用 BV 号；bvid 保留在索引与文件头。
 - 🧠 **固定认知提取 rubric**：一句话结论、论点与证据、关键数据、推理链条、思维模型、可证伪预测、立场与盲区、金句。
+- 📖 **原味精编**：每期另产出一份 2000–3500 字的「原味精编」——按原视频顺序保留原话、比喻、例子与数字（压缩到原文 25–40%），想看内容本身时直接读 `digests/`，不必只吃结论骨架。
 - 📊 **自动汇总**：从 67 篇笔记 0 token 汇总出 201 条预测账本 + 232 条金句（示例规模）。
 - 🔁 **增量更新**：只抓新增、只蒸馏新增，重复分析成本≈重跑一次综合。
 - 💰 **Token 经济**：raw 约 8–10k token/期只进子 agent；主上下文 20 期综合 < 2 万 token。
@@ -114,8 +116,8 @@ python "$SKILL/scripts/aggregate_notes.py" --up-dir "<analysis>/<昵称>_<UID>"
 ```
 
 > 蒸馏与综合是 agent 的职责：让每个视频开一个独立 subagent，读
-> `references/extraction-framework.md` + `show_content.py` 的输出，写一篇笔记到 `NOTE_FILE`。
-> 完整流程见 [SKILL.md](./SKILL.md)。
+> `references/extraction-framework.md` + `references/digest-framework.md` + `show_content.py` 的输出，
+> 分别写短笔记到 `NOTE_FILE`、原味精编到 `DIGEST_FILE`。完整流程见 [SKILL.md](./SKILL.md)。
 
 ## 输出结构
 
@@ -123,7 +125,8 @@ python "$SKILL/scripts/aggregate_notes.py" --up-dir "<analysis>/<昵称>_<UID>"
 <analysis>/<昵称>_<UID>/
 ├── index.json / index.md          # 视频清单（含 bvid、日期、期数、播放）
 ├── raw/<日期>_<标题>.json|.md     # 原始字幕/转写（用户可读）
-├── notes/<日期>_<标题>.md         # 每期认知笔记（agent 产出）
+├── notes/<日期>_<标题>.md         # 每期认知笔记（≤800 字，给综合用）
+├── digests/<日期>_<标题>.md       # 每期原味精编（2000–3500 字，给人读）
 ├── synthesis/                     # 分桶摘要 + quotes_all.md + predictions_intro.md
 ├── report.md                      # 认知档案主报告
 ├── quotes.md                      # 精选金句库
@@ -142,6 +145,7 @@ python "$SKILL/scripts/aggregate_notes.py" --up-dir "<analysis>/<昵称>_<UID>"
 
 - 抓取 / 转写 / 切片 / 汇总全部由脚本完成，不消耗 token；
 - raw 内容只进子 agent 上下文，笔记 ≤800 字跨期传递；
+- 每期 `digests/`（2000–3500 字）只给人读，**不进入综合上下文**；综合只读 notes；
 - 大样本（>40 期）用"分桶摘要 → 最终综合"两层 reduce。
 
 ## 配置

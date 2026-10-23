@@ -59,21 +59,25 @@ python "$SKILL/scripts/fetch_content.py" --up-dir "$UP_DIR" --limit 20 --mode au
 
 ### Step 4 逐期蒸馏（map，最关键）
 
+每期产出**两份文件**：短笔记（给跨期综合用，≤800 字）+ 原味精编（给人读，2000–3500 字）。
+
 对每个未处理的 bvid **开独立 subagent**（有 `workflow` 工具就 fan-out，每批 6–8 个；否则串行 subagent）：
 
 ```text
-Read <SKILL>/references/extraction-framework.md first.
+Read <SKILL>/references/extraction-framework.md and <SKILL>/references/digest-framework.md first.
 Video: <bvid> | Title: <title>
 1) python "$SKILL/scripts/show_content.py" --up-dir "$UP_DIR" --bvid <bvid> --part 1 --part-chars 4000
-   （输出头部的 NOTE_FILE= 就是笔记要写入的路径；part=1/N，依次读 --part 2..N）
-2) 写 ONE note 到 NOTE_FILE 指定的位置（文件名是"日期_标题"，不含 BV；若已存在则跳过）
+   （输出头部的 NOTE_FILE= / DIGEST_FILE= 就是两份文件的写入路径；part=1/N，依次读 --part 2..N）
+2) 写 NOTE_FILE：短笔记（≤800 字，按 extraction-framework.md；给综合用）
+3) 写 DIGEST_FILE：原味精编（2000–3500 字，按 digest-framework.md；保留原话/例子/叙事顺序，给人读）
+   若两份都已存在则跳过；只缺 digest 时补写 digest。
 Return only: "DONE <bvid>" or "FAIL <bvid> <reason>".
 ```
 
 纪律：
 - 主 agent **绝不**把 raw 字幕读进上下文（只收 subagent 的一行结果）。
-- 已有 `notes/<日期>_<标题>.md` → 跳过（缓存）。
-- 每条笔记 ≤ 800 汉字（≈600 token），章节严格按 framework。
+- 已有 `notes/<日期>_<标题>.md` 且 `digests/<日期>_<标题>.md` → 跳过（缓存）。
+- 短笔记 ≤800 汉字（≈600 token）；**digest 只给人读，不进入综合上下文**。
 
 ### Step 5 校验笔记（0 token）
 
@@ -117,9 +121,10 @@ python "$SKILL/scripts/aggregate_notes.py" --up-dir "$UP_DIR" --intro "$UP_DIR/s
 
 1. raw 内容（约 8–10k token/期）只进 subagent，不进主上下文。
 2. 跨上下文只传 notes（≈600 token/期）；20 期综合主上下文 < 2 万 token。
-3. 抓取/转写/切片/汇总全部由脚本完成，不产生 token。
-4. 一切按 bvid 缓存（文件名用"日期_标题"）；重复分析成本 ≈ 只跑一次综合。
-5. 先 3 期小样验证框架，再批量跑。
+3. `digests/`（2000–3500 字/期）只给人读，**不进入综合上下文**；综合只用 notes。
+4. 抓取/转写/切片/汇总全部由脚本完成，不产生 token。
+5. 一切按 bvid 缓存（文件名用"日期_标题"）；重复分析成本 ≈ 只跑一次综合。
+6. 先 3 期小样验证框架，再批量跑。
 
 ## 产物结构
 
@@ -127,7 +132,8 @@ python "$SKILL/scripts/aggregate_notes.py" --up-dir "$UP_DIR" --intro "$UP_DIR/s
 <analysis>/<昵称>_<UID>/
 ├── index.json / index.md      # 视频清单（脚本产出，含 bvid）
 ├── raw/<发布日期>_<标题>.json|.md  # 原始资料（字幕/转写）
-├── notes/<发布日期>_<标题>.md      # 每期认知笔记（agent 产出）
+├── notes/<发布日期>_<标题>.md      # 每期认知笔记（短，≤800 字；给综合用）
+├── digests/<发布日期>_<标题>.md    # 每期「原味精编」（2000–3500 字；给人读）
 ├── synthesis/                 # 大样本：分桶摘要 + quotes_all.md + predictions_intro.md
 ├── report.md                  # 认知档案（主报告）
 ├── quotes.md                  # 精选金句库
@@ -138,7 +144,7 @@ python "$SKILL/scripts/aggregate_notes.py" --up-dir "$UP_DIR" --intro "$UP_DIR/s
 
 - `up_index.py` — 建/刷新视频索引（UP 名自动解析，输出 index.json/md）
 - `fetch_content.py` — 抓字幕/AI 摘要/ASR，缓存化；支持 `--since/--until/--limit/--bvid`
-- `show_content.py` — 按 bvid 输出分片内容，头部打印 `NOTE_FILE`
+- `show_content.py` — 按 bvid 输出分片内容，头部打印 `NOTE_FILE` / `DIGEST_FILE`
 - `notes_check.py` — 笔记覆盖率与章节校验；支持 `--since/--until`
 - `aggregate_notes.py` — 从笔记自动汇总预测账本与金句（0 token）
 - `_common.py` / `_asr.py` — 公共工具与本地 ASR（`BILI_ASR_THREADS`/`BILI_ASR_BEAM` 可调）
@@ -157,5 +163,6 @@ python "$SKILL/scripts/aggregate_notes.py" --up-dir "$UP_DIR" --intro "$UP_DIR/s
 
 ## References
 
-- `references/extraction-framework.md` — 单期认知提取 rubric 与笔记模板（Step 4 必读）
+- `references/extraction-framework.md` — 单期认知提取 rubric 与短笔记模板（Step 4 必读，给综合用）
+- `references/digest-framework.md` — 单期「原味精编」rubric 与模板（Step 4 必读，给人读）
 - `references/synthesis-framework.md` — 综合报告/金句/预测账本模板（Step 6 必读）
