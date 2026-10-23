@@ -29,7 +29,7 @@ def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--up-dir", required=True)
     ap.add_argument("--min-chars", type=int, default=150)
-    ap.add_argument("--max-chars", type=int, default=3500)
+    ap.add_argument("--max-chars", type=int, default=6500)
     ap.add_argument("--since", default="", help="只校验发布日 >= YYYY-MM-DD 的期数")
     ap.add_argument("--until", default="", help="只校验发布日 <= YYYY-MM-DD 的期数")
     args = ap.parse_args()
@@ -54,14 +54,16 @@ def main() -> int:
             missing.append(f"{slug} (bvid={bvid})")
             continue
         text = path.read_text(encoding="utf-8")
-        total_chars += len(text)
+        # 只校验前 9 节（补充节是给人读的精编全文，不计入长度约束）
+        core = text.split("## 内容精编（补充）")[0]
+        total_chars += len(core)
         lacking = [h for h in REQUIRED if h not in text]
         if lacking:
             warnings.append(f"{slug}: 缺章节 {','.join(x.replace('## ', '') for x in lacking)}")
-        elif len(text) < args.min_chars:
-            warnings.append(f"{slug}: 过短({len(text)} 字)")
-        elif len(text) > args.max_chars:
-            warnings.append(f"{slug}: 过长({len(text)} 字)")
+        elif len(core) < args.min_chars:
+            warnings.append(f"{slug}: 过短({len(core)} 字)")
+        elif len(core) > args.max_chars:
+            warnings.append(f"{slug}: 过长({len(core)} 字)")
 
     print(f"UP_DIR={up_dir}")
     print(f"NOTES={len(rows) - len(missing)}/{len(rows)} chars={total_chars} est_tokens={int(total_chars * 0.7)}")

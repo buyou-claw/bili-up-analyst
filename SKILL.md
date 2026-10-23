@@ -78,7 +78,7 @@ Return only: "DONE <bvid>" or "FAIL <bvid> <reason>".
 - 主 agent **绝不**把 raw 字幕读进上下文（只收 subagent 的一行结果）。
 - 已有 `notes/<日期>_<标题>.md` 且 `digests/<日期>_<标题>.md` → 跳过（缓存）。
 - 短笔记 ≤800 汉字（≈600 token）；**digest 只给人读，不进入综合上下文**。
-- 全部精编完成后跑 `append_digest_excerpt.py`：把精编的**节选**作为最后一段（`## 内容精编（补充）`）追加到原笔记，原 9 节格式不变。
+- 全部精编完成后跑 `append_digest_excerpt.py`：把精编的**完整「内容精编」章节**（覆盖全片 4–8 段，按原视频顺序）作为最后一段（`## 内容精编（补充）`）追加到原笔记，原 9 节格式不变。
 
 ### Step 5 校验笔记（0 token）
 
